@@ -64,7 +64,7 @@ int main(int argc,char** argv) {
   
   LCM2ROS handlerObject(lcm, nh);
   cout << "\nlcm2ros translator ready\n";
-  ROS_ERROR("LCM2ROS Translator Ready");
+  ROS_INFO("LCM2ROS Translator Ready");
   
   while(0 == lcm->handle());
   return 0;

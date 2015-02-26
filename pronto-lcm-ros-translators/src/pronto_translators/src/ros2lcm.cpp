@@ -27,6 +27,9 @@
 #include <trooper_mlc_msgs/CachedRawIMUData.h>
 #include <trooper_mlc_msgs/RawIMUData.h>
 
+#include <vigir_atlas_control_msgs/VigirCachedIMUData.h>
+#include <atlas_msgs/AtlasState.h>
+
 #include <lcm/lcm-cpp.hpp>
 #include <lcmtypes/bot_core.hpp>
 #include "lcmtypes/pronto/atlas_behavior_t.hpp"
@@ -85,7 +88,7 @@ private:
   void imu_batch_cb(const trooper_mlc_msgs::CachedRawIMUDataConstPtr& msg);
   ros::Subscriber imu_batch_sub_;
   sensor_msgs::Imu imu_batch_msg_;
-
+  
   void behavior_cb(const std_msgs::Int32ConstPtr& msg);
   ros::Subscriber behavior_sub_;
 
@@ -93,6 +96,18 @@ private:
   
   int64_t last_joint_state_utime_;
   bool verbose_;
+
+  //ViGIR additions 
+  void vigir_imu_batch_cb(const vigir_atlas_control_msgs::VigirCachedIMUDataConstPtr& msg);
+  ros::Subscriber vigir_imu_batch_sub_;
+  sensor_msgs::Imu vigir_imu_batch_msg_;
+  
+  void vigir_atlas_state_cb(const atlas_msgs::AtlasStateConstPtr& msg);
+  ros::Subscriber vigir_atlas_state_sub_;
+  
+  //Helper for filling out F/T data
+  void appendForceTorque(pronto::force_torque_t& msg_out, const atlas_msgs::AtlasState& msg_in);
+
 };
 
 App::App(ros::NodeHandle node_, bool send_ground_truth_) :
@@ -125,9 +140,25 @@ App::App(ros::NodeHandle node_, bool send_ground_truth_) :
   foot_sensor_sub_ = node_.subscribe(string("/foot_contact_service/foot_sensor"), 100, &App::foot_sensor_cb,this);
   imu_sub_ = node_.subscribe(string("/imu_publisher_service/imu"), 100, &App::imu_cb,this);
   imu_batch_sub_ = node_.subscribe(string("/imu_publisher_service/raw_imu"), 100, &App::imu_batch_cb,this);
-
+  
   behavior_sub_ = node_.subscribe(string("/current_behavior"), 100, &App::behavior_cb,this);
   verbose_ = false;
+  
+  // ViGIR additions
+  // Retrieve raw IMU data
+  vigir_imu_batch_sub_   = node_.subscribe(string("/flor/controller/raw_imu"),
+                                        100,
+                                        &App::vigir_imu_batch_cb,
+                                        this,
+                                        ros::TransportHints().tcpNoDelay());
+
+  // Retrieve joint states plus foot sensor states
+  vigir_atlas_state_sub_ = node_.subscribe(string("/flor/controller/atlas_state"),
+                                        100,
+                                        &App::vigir_atlas_state_cb,
+                                        this,
+                                        ros::TransportHints().tcpNoDelay());
+
 };
 
 App::~App()  {
@@ -281,10 +312,41 @@ void App::imu_batch_cb(const trooper_mlc_msgs::CachedRawIMUDataConstPtr& msg){
     raw.linear_acceleration[2] = msg->data[i].ddz;
     imu.raw_imu.push_back( raw );
   }
+  
   lcm_publish_.publish( ("ATLAS_IMU_BATCH") , &imu);
 }
 
+void App::vigir_imu_batch_cb(const vigir_atlas_control_msgs::VigirCachedIMUDataConstPtr& msg){
 
+  pronto::atlas_raw_imu_batch_t imu;
+  imu.utime = (int64_t) floor(msg->header.stamp.toNSec()/1000);
+
+  if (verbose_)
+    std::cout <<"                              " << imu.utime << " imu\n";
+
+  imu.num_packets = 15;
+  for (size_t i=0; i < 15 ; i++){
+    
+    //std::cout << i
+    //  << " | " <<  msg->data[i].imu_timestamp
+    //  << " | " <<  msg->data[i].packet_count
+    //  << " | " <<  msg->data[i].dax << " " << msg->data[i].day << " " << msg->data[i].daz
+    //  << " | " <<  msg->data[i].ddx << " " << msg->data[i].ddy << " " << msg->data[i].ddz << "\n";
+    
+    pronto::atlas_raw_imu_t raw;
+    raw.utime = msg->imu_data[i].imu_timestamp;
+    raw.packet_count = msg->imu_data[i].packet_count;
+    raw.delta_rotation[0] = msg->imu_data[i].da.x;
+    raw.delta_rotation[1] = msg->imu_data[i].da.y;
+    raw.delta_rotation[2] = msg->imu_data[i].da.z;
+    
+    raw.linear_acceleration[0] = msg->imu_data[i].dd.x;
+    raw.linear_acceleration[1] = msg->imu_data[i].dd.y;
+    raw.linear_acceleration[2] = msg->imu_data[i].dd.z;
+    imu.raw_imu.push_back( raw );
+  }
+  lcm_publish_.publish( ("ATLAS_IMU_BATCH") , &imu);
+}
 
 void App::head_joint_states_cb(const sensor_msgs::JointStateConstPtr& msg){
   int64_t utime = (int64_t) floor(msg->header.stamp.toNSec()/1000);
@@ -501,6 +563,176 @@ void App::appendFootSensor(pronto::force_torque_t& msg_out , trooper_mlc_msgs::F
   msg_out.r_hand_torque[2] =  0;
 }
 
+void App::vigir_atlas_state_cb(const atlas_msgs::AtlasStateConstPtr& msg){
+/*
+arms joint mapping is entered properly
+
+in, in_name, out
+0, r_arm_shx, 16
+1, r_arm_elx, 17
+2, r_leg_akx, 15
+3, back_bkx, 2
+4, l_arm_wry, 18
+5, r_leg_hpy, 12
+9, r_arm_wry, 19
+10, l_leg_kny, 7
+13, l_arm_elx, 20
+16, r_leg_aky, 14
+20, l_arm_shy, 21
+23, r_leg_kny, 13
+24, r_arm_wrx, 22
+26, l_leg_akx, 9
+27, l_arm_ely, 23
+28, l_arm_wrx, 24
+29, l_leg_hpx, 5
+30, l_leg_hpy, 6
+31, l_leg_hpz, 4
+34, r_leg_hpx, 11
+35, l_arm_shx, 25
+40, back_bky, 1
+42, r_arm_shy, 26
+43, neck_ry, 3
+45, r_leg_hpz, 10
+47, back_bkz, 0
+48, l_leg_aky, 8
+49, r_arm_ely, 27
+*/
+  std::vector< std::pair<int,int> > jm;
+
+/*
+jm.push_back (  std::make_pair( 0       ,       16      ));
+jm.push_back (  std::make_pair( 1       ,       17      ));
+jm.push_back (  std::make_pair( 2       ,       15      ));
+jm.push_back (  std::make_pair( 3       ,       2       ));
+jm.push_back (  std::make_pair( 4       ,       18      ));
+jm.push_back (  std::make_pair( 5       ,       12      ));
+jm.push_back (  std::make_pair( 9       ,       19      ));
+jm.push_back (  std::make_pair( 10      ,       7       ));
+jm.push_back (  std::make_pair( 13      ,       20      ));
+jm.push_back (  std::make_pair( 16      ,       14      ));
+jm.push_back (  std::make_pair( 20      ,       21      ));
+jm.push_back (  std::make_pair( 23      ,       13      ));
+jm.push_back (  std::make_pair( 24      ,       22      ));
+jm.push_back (  std::make_pair( 26      ,       9       ));
+jm.push_back (  std::make_pair( 27      ,       23      ));
+jm.push_back (  std::make_pair( 28      ,       24      ));
+jm.push_back (  std::make_pair( 29      ,       5       ));
+jm.push_back (  std::make_pair( 30      ,       6       ));
+jm.push_back (  std::make_pair( 31      ,       4       ));
+jm.push_back (  std::make_pair( 34      ,       11      ));
+jm.push_back (  std::make_pair( 35      ,       25      ));
+jm.push_back (  std::make_pair( 40      ,       1       ));
+jm.push_back (  std::make_pair( 42      ,       26      ));
+jm.push_back (  std::make_pair( 43      ,       3       ));
+jm.push_back (  std::make_pair( 45      ,       10      ));
+jm.push_back (  std::make_pair( 47      ,       0       ));
+jm.push_back (  std::make_pair( 48      ,       8       ));
+jm.push_back (  std::make_pair( 49      ,       27      )); */
+
+/*
+  jm.push_back (  std::make_pair( getIndex(msg->name, "r_arm_shx") , 16  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "r_arm_elx") , 17  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "r_leg_akx") , 15  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "back_bkx") , 2  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "l_arm_wry") , 18  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "r_leg_hpy") , 12  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "r_arm_wry") , 19  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "l_leg_kny") , 7  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "l_arm_elx") , 20  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "r_leg_aky") , 14  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "l_arm_shy") , 21  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "r_leg_kny") , 13  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "r_arm_wrx") , 22  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "l_leg_akx") , 9  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "l_arm_ely") , 23  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "l_arm_wrx") , 24  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "l_leg_hpx") , 5  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "l_leg_hpy") , 6  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "l_leg_hpz") , 4  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "r_leg_hpx") , 11  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "l_arm_shx") , 25  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "back_bky") , 1  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "r_arm_shy") , 26  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "neck_ry") , 3  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "r_leg_hpz") , 10  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "back_bkz") , 0  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "l_leg_aky") , 8  ));
+  jm.push_back (  std::make_pair( getIndex(msg->name, "r_arm_ely") , 27  ));
+*/
+  int n_joints = jm.size();
+
+
+  /*
+  if (js_counter%500 ==0){
+    std::cout << "J ST " << js_counter << "\n";
+  }  
+  js_counter++;
+  */
+  
+  pronto::atlas_state_t msg_out;
+  msg_out.utime = (int64_t) msg->header.stamp.toNSec()/1000; // from nsec to usec  
+
+  if (verbose_)
+    std::cout << msg_out.utime << " jnt\n";
+
+  double elapsed_utime = (msg_out.utime - last_joint_state_utime_)*1E-6;
+  if (elapsed_utime>0.004)
+    std::cout << elapsed_utime << "   is elapsed_utime in sec\n";
+
+  msg_out.joint_position.assign(n_joints , std::numeric_limits<int>::min()  );
+  msg_out.joint_velocity.assign(n_joints , std::numeric_limits<int>::min()  );
+  msg_out.joint_effort.assign(n_joints , std::numeric_limits<int>::min()  );
+  msg_out.num_joints = n_joints;
+
+  for (std::vector<int>::size_type i = 0; i < jm.size(); i++)  {
+    //std::cout << jm[i].first << " and " << jm[i].second << "\n";
+    msg_out.joint_position[ jm[i].second ] = msg->position[ jm[i].first ];      
+    msg_out.joint_velocity[ jm[i].second ] = msg->velocity[ jm[i].first ];
+    msg_out.joint_effort[ jm[i].second ] = msg->effort[ jm[i].first ];
+  }
+
+
+  // Append FT sensor info
+  pronto::force_torque_t force_torque;
+  appendForceTorque(force_torque, *msg);
+  msg_out.force_torque = force_torque;
+  lcm_publish_.publish("ATLAS_STATE", &msg_out);
+  
+  pronto::utime_t utime_msg;
+  int64_t joint_utime = (int64_t) msg->header.stamp.toNSec()/1000; // from nsec to usec
+  utime_msg.utime = joint_utime;
+  lcm_publish_.publish("ROBOT_UTIME", &utime_msg); 
+
+  //sendMultisenseState(joint_utime, msg->position[22], 0);
+
+  last_joint_state_utime_ = joint_utime;
+}
+
+
+void App::appendForceTorque(pronto::force_torque_t& msg_out, const atlas_msgs::AtlasState& msg_in){
+  msg_out.l_foot_force_z  =  msg_in.l_foot.force.z;
+  msg_out.l_foot_torque_x =  msg_in.l_foot.torque.x;
+  msg_out.l_foot_torque_y  =  msg_in.l_foot.torque.y;
+  msg_out.r_foot_force_z  =  msg_in.r_foot.force.z;
+  msg_out.r_foot_torque_x  =  msg_in.r_foot.torque.x;
+  msg_out.r_foot_torque_y  =   msg_in.r_foot.torque.y;
+
+  // Too lazy to fill out for the moment ;)
+  msg_out.l_hand_force[0] =  0;
+  msg_out.l_hand_force[1] =  0;
+  msg_out.l_hand_force[2] =  0;
+  msg_out.l_hand_torque[0] = 0;
+  msg_out.l_hand_torque[1] = 0;
+  msg_out.l_hand_torque[2] = 0;
+  msg_out.r_hand_force[0] =  0;
+  msg_out.r_hand_force[1] =  0;
+  msg_out.r_hand_force[2] =  0;
+  msg_out.r_hand_torque[0] =  0;
+  msg_out.r_hand_torque[1] =  0;
+  msg_out.r_hand_torque[2] =  0;
+}
+
+
 
 int main(int argc, char **argv){
   bool send_ground_truth = false;  
@@ -509,7 +741,7 @@ int main(int argc, char **argv){
   ros::NodeHandle nh;
   new App(nh, send_ground_truth);
   std::cout << "ros2lcm translator ready\n";
-  ROS_ERROR("ROS2LCM Translator Ready");
+  ROS_INFO("ROS2LCM Translator Ready");
   ros::spin();
   return 0;
 }

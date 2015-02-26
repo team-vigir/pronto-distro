@@ -14,6 +14,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   atlas_hardware_interface
+  vigir_atlas_control_msgs
+  atlas_msgs
 )
 
 ## System dependencies are found with CMake's conventions
