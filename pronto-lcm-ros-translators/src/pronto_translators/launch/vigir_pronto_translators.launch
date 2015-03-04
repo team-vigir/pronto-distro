@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+  <!-- Convert laser scan to 3D point cloud in sensor frame -->
+  <node pkg="pronto-lcm-ros-translators" type="ros2lcm" name="ros2lcm" respawn="true">
+  </node>
+
+  <node pkg="pronto-lcm-ros-translators" type="lcm2ros" name="lcm2ros" respawn="true">
+  </node>
+
+</launch>
+
+
