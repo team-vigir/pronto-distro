@@ -44,6 +44,41 @@
 
 using namespace std;
 
+typedef enum
+{
+  JOINT_UNKNOWN     = -1,
+  JOINT_BACK_BKZ    = 0,
+  JOINT_BACK_BKY    = 1,
+  JOINT_BACK_BKX    = 2,
+  JOINT_NECK_AY     = 3,
+  JOINT_L_LEG_HPZ   = 4,
+  JOINT_L_LEG_HPX   = 5,
+  JOINT_L_LEG_HPY   = 6,
+  JOINT_L_LEG_KNY   = 7,
+  JOINT_L_LEG_AKY   = 8,
+  JOINT_L_LEG_AKX   = 9,
+  JOINT_R_LEG_HPZ   = 10,
+  JOINT_R_LEG_HPX   = 11,
+  JOINT_R_LEG_HPY   = 12,
+  JOINT_R_LEG_KNY   = 13,
+  JOINT_R_LEG_AKY   = 14,
+  JOINT_R_LEG_AKX   = 15,
+  JOINT_L_ARM_SHZ   = 16,
+  JOINT_L_ARM_SHX   = 17,
+  JOINT_L_ARM_ELY   = 18,
+  JOINT_L_ARM_ELX   = 19,
+  JOINT_L_ARM_UWY   = 20,
+  JOINT_L_ARM_MWX   = 21,
+  JOINT_R_ARM_SHZ   = 22,
+  JOINT_R_ARM_SHX   = 23,
+  JOINT_R_ARM_ELY   = 24,
+  JOINT_R_ARM_ELX   = 25,
+  JOINT_R_ARM_UWY   = 26,
+  JOINT_R_ARM_MWX   = 27,
+  NUM_JOINTS
+
+} AtlasJoints;
+
 class App{
 public:
   App(ros::NodeHandle node_, bool send_ground_truth_);
@@ -629,36 +664,36 @@ jm.push_back (  std::make_pair( 47      ,       0       ));
 jm.push_back (  std::make_pair( 48      ,       8       ));
 jm.push_back (  std::make_pair( 49      ,       27      )); */
 
-/*
-  jm.push_back (  std::make_pair( getIndex(msg->name, "r_arm_shx") , 16  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "r_arm_elx") , 17  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "r_leg_akx") , 15  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "back_bkx") , 2  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "l_arm_wry") , 18  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "r_leg_hpy") , 12  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "r_arm_wry") , 19  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "l_leg_kny") , 7  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "l_arm_elx") , 20  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "r_leg_aky") , 14  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "l_arm_shy") , 21  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "r_leg_kny") , 13  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "r_arm_wrx") , 22  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "l_leg_akx") , 9  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "l_arm_ely") , 23  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "l_arm_wrx") , 24  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "l_leg_hpx") , 5  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "l_leg_hpy") , 6  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "l_leg_hpz") , 4  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "r_leg_hpx") , 11  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "l_arm_shx") , 25  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "back_bky") , 1  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "r_arm_shy") , 26  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "neck_ry") , 3  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "r_leg_hpz") , 10  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "back_bkz") , 0  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "l_leg_aky") , 8  ));
-  jm.push_back (  std::make_pair( getIndex(msg->name, "r_arm_ely") , 27  ));
-*/
+
+  jm.push_back (  JOINT_R_ARM_SHX std::make_pair( getIndex(msg->name, "r_arm_shx") , 16  ));
+  jm.push_back (  JOINT_R_ARM_ELX std::make_pair( getIndex(msg->name, "r_arm_elx") , 17  ));
+  jm.push_back (  JOINT_R_LEG_AKX std::make_pair( getIndex(msg->name, "r_leg_akx") , 15  ));
+  jm.push_back (  JOINT_BACK_BKX std::make_pair( getIndex(msg->name, "back_bkx") , 2  ));
+  jm.push_back (  JOINT_L_ARM_UWY std::make_pair( getIndex(msg->name, "l_arm_wry") , 18  ));
+  jm.push_back (  JOINT_R_LEG_HPY std::make_pair( getIndex(msg->name, "r_leg_hpy") , 12  ));
+  jm.push_back (  JOINT_R_ARM_UWY std::make_pair( getIndex(msg->name, "r_arm_wry") , 19  ));
+  jm.push_back (  JOINT_L_LEG_KNY std::make_pair( getIndex(msg->name, "l_leg_kny") , 7  ));
+  jm.push_back (  JOINT_L_ARM_ELX std::make_pair( getIndex(msg->name, "l_arm_elx") , 20  ));
+  jm.push_back (  JOINT_L_LEG_AKY std::make_pair( getIndex(msg->name, "r_leg_aky") , 14  ));
+  jm.push_back (  JOINT_L_ARM_SHZ std::make_pair( getIndex(msg->name, "l_arm_shy") , 21  ));
+  jm.push_back (  JOINT_R_LEG_KNY std::make_pair( getIndex(msg->name, "r_leg_kny") , 13  ));
+  jm.push_back (  JOINT_R_ARM_MWX std::make_pair( getIndex(msg->name, "r_arm_wrx") , 22  ));
+  jm.push_back (  JOINT_L_LEG_AKX std::make_pair( getIndex(msg->name, "l_leg_akx") , 9  ));
+  jm.push_back (  JOINT_L_ARM_ELY std::make_pair( getIndex(msg->name, "l_arm_ely") , 23  ));
+  jm.push_back (  JOINT_R_ARM_MWX std::make_pair( getIndex(msg->name, "l_arm_wrx") , 24  ));
+  jm.push_back (  JOINT_L_LEG_HPX std::make_pair( getIndex(msg->name, "l_leg_hpx") , 5  ));
+  jm.push_back (  JOINT_L_LEG_HPY std::make_pair( getIndex(msg->name, "l_leg_hpy") , 6  ));
+  jm.push_back (  JOINT_L_LEG_HPZ std::make_pair( getIndex(msg->name, "l_leg_hpz") , 4  ));
+  jm.push_back (  JOINT_R_LEG_HPX std::make_pair( getIndex(msg->name, "r_leg_hpx") , 11  ));
+  jm.push_back (  JOINT_L_ARM_SHX std::make_pair( getIndex(msg->name, "l_arm_shx") , 25  ));
+  jm.push_back (  JOINT_BACK_BKY std::make_pair( getIndex(msg->name, "back_bky") , 1  ));
+  jm.push_back (  JOINT_R_ARM_SHZ std::make_pair( getIndex(msg->name, "r_arm_shy") , 26  ));
+  jm.push_back (  JOINT_NECK_AY std::make_pair( getIndex(msg->name, "neck_ry") , 3  ));
+  jm.push_back (  JOINT_R_LEG_HPZ std::make_pair( getIndex(msg->name, "r_leg_hpz") , 10  ));
+  jm.push_back (  JOINT_BACK_BKZ std::make_pair( getIndex(msg->name, "back_bkz") , 0  ));
+  jm.push_back (  JOINT_L_LEG_AKY std::make_pair( getIndex(msg->name, "l_leg_aky") , 8  ));
+  jm.push_back (  JOINT_R_ARM_ELY std::make_pair( getIndex(msg->name, "r_arm_ely") , 27  ));
+
   int n_joints = jm.size();
 
 
