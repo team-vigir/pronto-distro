@@ -665,34 +665,34 @@ jm.push_back (  std::make_pair( 48      ,       8       ));
 jm.push_back (  std::make_pair( 49      ,       27      )); */
 
 
-  jm.push_back (  JOINT_R_ARM_SHX std::make_pair( getIndex(msg->name, "r_arm_shx") , 16  ));
-  jm.push_back (  JOINT_R_ARM_ELX std::make_pair( getIndex(msg->name, "r_arm_elx") , 17  ));
-  jm.push_back (  JOINT_R_LEG_AKX std::make_pair( getIndex(msg->name, "r_leg_akx") , 15  ));
-  jm.push_back (  JOINT_BACK_BKX std::make_pair( getIndex(msg->name, "back_bkx") , 2  ));
-  jm.push_back (  JOINT_L_ARM_UWY std::make_pair( getIndex(msg->name, "l_arm_wry") , 18  ));
-  jm.push_back (  JOINT_R_LEG_HPY std::make_pair( getIndex(msg->name, "r_leg_hpy") , 12  ));
-  jm.push_back (  JOINT_R_ARM_UWY std::make_pair( getIndex(msg->name, "r_arm_wry") , 19  ));
-  jm.push_back (  JOINT_L_LEG_KNY std::make_pair( getIndex(msg->name, "l_leg_kny") , 7  ));
-  jm.push_back (  JOINT_L_ARM_ELX std::make_pair( getIndex(msg->name, "l_arm_elx") , 20  ));
-  jm.push_back (  JOINT_L_LEG_AKY std::make_pair( getIndex(msg->name, "r_leg_aky") , 14  ));
-  jm.push_back (  JOINT_L_ARM_SHZ std::make_pair( getIndex(msg->name, "l_arm_shy") , 21  ));
-  jm.push_back (  JOINT_R_LEG_KNY std::make_pair( getIndex(msg->name, "r_leg_kny") , 13  ));
-  jm.push_back (  JOINT_R_ARM_MWX std::make_pair( getIndex(msg->name, "r_arm_wrx") , 22  ));
-  jm.push_back (  JOINT_L_LEG_AKX std::make_pair( getIndex(msg->name, "l_leg_akx") , 9  ));
-  jm.push_back (  JOINT_L_ARM_ELY std::make_pair( getIndex(msg->name, "l_arm_ely") , 23  ));
-  jm.push_back (  JOINT_R_ARM_MWX std::make_pair( getIndex(msg->name, "l_arm_wrx") , 24  ));
-  jm.push_back (  JOINT_L_LEG_HPX std::make_pair( getIndex(msg->name, "l_leg_hpx") , 5  ));
-  jm.push_back (  JOINT_L_LEG_HPY std::make_pair( getIndex(msg->name, "l_leg_hpy") , 6  ));
-  jm.push_back (  JOINT_L_LEG_HPZ std::make_pair( getIndex(msg->name, "l_leg_hpz") , 4  ));
-  jm.push_back (  JOINT_R_LEG_HPX std::make_pair( getIndex(msg->name, "r_leg_hpx") , 11  ));
-  jm.push_back (  JOINT_L_ARM_SHX std::make_pair( getIndex(msg->name, "l_arm_shx") , 25  ));
-  jm.push_back (  JOINT_BACK_BKY std::make_pair( getIndex(msg->name, "back_bky") , 1  ));
-  jm.push_back (  JOINT_R_ARM_SHZ std::make_pair( getIndex(msg->name, "r_arm_shy") , 26  ));
-  jm.push_back (  JOINT_NECK_AY std::make_pair( getIndex(msg->name, "neck_ry") , 3  ));
-  jm.push_back (  JOINT_R_LEG_HPZ std::make_pair( getIndex(msg->name, "r_leg_hpz") , 10  ));
-  jm.push_back (  JOINT_BACK_BKZ std::make_pair( getIndex(msg->name, "back_bkz") , 0  ));
-  jm.push_back (  JOINT_L_LEG_AKY std::make_pair( getIndex(msg->name, "l_leg_aky") , 8  ));
-  jm.push_back (  JOINT_R_ARM_ELY std::make_pair( getIndex(msg->name, "r_arm_ely") , 27  ));
+  jm.push_back (  std::make_pair((int)JOINT_R_ARM_SHX , 16)); //std::make_pair( getIndex(msg->name, "r_arm_shx")
+  jm.push_back (  std::make_pair((int)JOINT_R_ARM_ELX , 17)); //std::make_pair( getIndex(msg->name, "r_arm_elx")
+  jm.push_back (  std::make_pair((int)JOINT_R_LEG_AKX , 15)); //std::make_pair( getIndex(msg->name, "r_leg_akx")
+  jm.push_back (  std::make_pair((int)JOINT_BACK_BKX  ,  2)); //std::make_pair( getIndex(msg->name, "back_bkx")
+  jm.push_back (  std::make_pair((int)JOINT_L_ARM_UWY , 18)); //std::make_pair( getIndex(msg->name, "l_arm_wry")
+  jm.push_back (  std::make_pair((int)JOINT_R_LEG_HPY , 12)); //std::make_pair( getIndex(msg->name, "r_leg_hpy")
+  jm.push_back (  std::make_pair((int)JOINT_R_ARM_UWY , 19)); //std::make_pair( getIndex(msg->name, "r_arm_wry")
+  jm.push_back (  std::make_pair((int)JOINT_L_LEG_KNY ,  7)); //std::make_pair( getIndex(msg->name, "l_leg_kny")
+  jm.push_back (  std::make_pair((int)JOINT_L_ARM_ELX , 20)); //std::make_pair( getIndex(msg->name, "l_arm_elx")
+  jm.push_back (  std::make_pair((int)JOINT_L_LEG_AKY , 14)); //std::make_pair( getIndex(msg->name, "r_leg_aky")
+  jm.push_back (  std::make_pair((int)JOINT_L_ARM_SHZ , 21)); // std::make_pair( getIndex(msg->name, "l_arm_shy")
+  jm.push_back (  std::make_pair((int)JOINT_R_LEG_KNY , 13)); //std::make_pair( getIndex(msg->name, "r_leg_kny")
+  jm.push_back (  std::make_pair((int)JOINT_R_ARM_MWX , 22)); //std::make_pair( getIndex(msg->name, "r_arm_wrx")
+  jm.push_back (  std::make_pair((int)JOINT_L_LEG_AKX ,  9)); //std::make_pair( getIndex(msg->name, "l_leg_akx")
+  jm.push_back (  std::make_pair((int)JOINT_L_ARM_ELY , 23)); //std::make_pair( getIndex(msg->name, "l_arm_ely")
+  jm.push_back (  std::make_pair((int)JOINT_R_ARM_MWX , 24)); //std::make_pair( getIndex(msg->name, "l_arm_wrx")
+  jm.push_back (  std::make_pair((int)JOINT_L_LEG_HPX ,  5)); //std::make_pair( getIndex(msg->name, "l_leg_hpx")
+  jm.push_back (  std::make_pair((int)JOINT_L_LEG_HPY ,  6)); //std::make_pair( getIndex(msg->name, "l_leg_hpy")
+  jm.push_back (  std::make_pair((int)JOINT_L_LEG_HPZ ,  4)); //std::make_pair( getIndex(msg->name, "l_leg_hpz")
+  jm.push_back (  std::make_pair((int)JOINT_R_LEG_HPX , 11)); //std::make_pair( getIndex(msg->name, "r_leg_hpx")
+  jm.push_back (  std::make_pair((int)JOINT_L_ARM_SHX , 25)); //std::make_pair( getIndex(msg->name, "l_arm_shx")
+  jm.push_back (  std::make_pair((int)JOINT_BACK_BKY  ,  1)); //std::make_pair( getIndex(msg->name, "back_bky")
+  jm.push_back (  std::make_pair((int)JOINT_R_ARM_SHZ , 26)); //std::make_pair( getIndex(msg->name, "r_arm_shy")
+  jm.push_back (  std::make_pair((int)JOINT_NECK_AY   ,  3)); //std::make_pair( getIndex(msg->name, "neck_ry")
+  jm.push_back (  std::make_pair((int)JOINT_R_LEG_HPZ , 10)); //std::make_pair( getIndex(msg->name, "r_leg_hpz")
+  jm.push_back (  std::make_pair((int)JOINT_BACK_BKZ  ,  0)); //std::make_pair( getIndex(msg->name, "back_bkz")
+  jm.push_back (  std::make_pair((int)JOINT_L_LEG_AKY ,  8)); //std::make_pair( getIndex(msg->name, "l_leg_aky")
+  jm.push_back (  std::make_pair((int)JOINT_R_ARM_ELY , 27)); //std::make_pair( getIndex(msg->name, "r_arm_ely")
 
   int n_joints = jm.size();
 
