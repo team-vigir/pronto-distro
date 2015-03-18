@@ -38,6 +38,8 @@ void LCM2ROS::poseBodyHandler(const lcm::ReceiveBuffer* rbuf, const std::string 
   //ROS_ERROR("LCM2ROS got pose_t");
   nav_msgs::Odometry msgout;
   msgout.header.stamp= ros::Time().fromSec(msg->utime*1E-6);
+  msgout.header.frame_id = "world";
+  msgout.child_frame_id = "pelvis";
   msgout.pose.pose.position.x = msg->pos[0];
   msgout.pose.pose.position.y = msg->pos[1];
   msgout.pose.pose.position.z = msg->pos[2];
