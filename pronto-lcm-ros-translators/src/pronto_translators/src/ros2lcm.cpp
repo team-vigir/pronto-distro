@@ -153,7 +153,7 @@ App::App(ros::NodeHandle node_, bool send_ground_truth_) :
   }
 
   // Atlas Joints and FT sensor
-  joint_states_sub_ = node_.subscribe(string("joint_states"), 100, &App::joint_states_cb,this);
+  joint_states_sub_ = node_.subscribe(string("/atlas/joint_states"), 100, &App::joint_states_cb,this);
 
   // The position and orientation from BDI's own estimator (or GT from Gazebo):
   if (send_ground_truth_){
@@ -170,10 +170,10 @@ App::App(ros::NodeHandle node_, bool send_ground_truth_) :
 
 
   // Multisense Joint Angles:
-  head_joint_states_sub_ = node_.subscribe(string("/spindle_state"), 100, &App::head_joint_states_cb,this);
+  head_joint_states_sub_ = node_.subscribe(string("/multisense/joint_states"), 100, &App::head_joint_states_cb,this);
 
   // Laser:
-  rotating_scan_sub_ = node_.subscribe(string("/multisense_sl/laser/scan"), 100, &App::rotating_scan_cb,this);
+  rotating_scan_sub_ = node_.subscribe(string("/multisense/lidar_scan"), 100, &App::rotating_scan_cb,this);
 
   // LM:
   foot_sensor_sub_ = node_.subscribe(string("/foot_contact_service/foot_sensor"), 100, &App::foot_sensor_cb,this);
@@ -407,7 +407,7 @@ void App::sendMultisenseState(int64_t utime, float position, float velocity){
 
   msg_out.joint_position[0] = position;
   msg_out.joint_velocity[0] = velocity;
-  msg_out.joint_name[0] = "hokuyo_joint";
+  msg_out.joint_name[0] = "motor_joint";
 
   lcm_publish_.publish("MULTISENSE_STATE", &msg_out);  
 }
