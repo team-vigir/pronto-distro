@@ -212,7 +212,7 @@ void App::foot_sensor_cb(const trooper_mlc_msgs::FootSensorConstPtr& msg){
 
 
 void App::behavior_cb(const std_msgs::Int32ConstPtr& msg){
-//  ROS_ERROR("BHER %d", msg->data );
+//  ROS_INFO("BHER %d", msg->data );
   pronto::atlas_behavior_t msg_out;
 
   msg_out.utime = last_joint_state_utime_;
@@ -226,7 +226,7 @@ void App::behavior_cb(const std_msgs::Int32ConstPtr& msg){
 int scan_counter=0;
 void App::rotating_scan_cb(const sensor_msgs::LaserScanConstPtr& msg){
   if (scan_counter%80 ==0){
-    ROS_ERROR("LSCAN [%d]", scan_counter );
+    ROS_INFO("LSCAN [%d]", scan_counter );
     //std::cout << "SCAN " << scan_counter << "\n";
   }  
   scan_counter++;
@@ -252,7 +252,7 @@ void App::send_lidar(const sensor_msgs::LaserScanConstPtr& msg,string channel ){
 int gt_counter =0;
 void App::pose_bdi_cb(const nav_msgs::OdometryConstPtr& msg){
   if (gt_counter%1000 ==0){
-    ROS_ERROR("BDI  [%d]", gt_counter );
+    ROS_INFO("BDI  [%d]", gt_counter );
   }  
   gt_counter++;
 
