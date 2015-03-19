@@ -153,7 +153,8 @@ App::App(ros::NodeHandle node_, bool send_ground_truth_) :
   }
 
   // Atlas Joints and FT sensor
-  joint_states_sub_ = node_.subscribe(string("/atlas/joint_states"), 100, &App::joint_states_cb,this);
+  // Commenting this out because ViGIR using a custome one.
+  //joint_states_sub_ = node_.subscribe(string("/atlas/joint_states"), 100, &App::joint_states_cb,this);
 
   // The position and orientation from BDI's own estimator (or GT from Gazebo):
   if (send_ground_truth_){
