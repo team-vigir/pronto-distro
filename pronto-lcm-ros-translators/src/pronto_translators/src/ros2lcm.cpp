@@ -153,7 +153,8 @@ App::App(ros::NodeHandle node_, bool send_ground_truth_) :
   }
 
   // Atlas Joints and FT sensor
-  joint_states_sub_ = node_.subscribe(string("joint_states"), 100, &App::joint_states_cb,this);
+  // Commenting this out because ViGIR using a custome one.
+  //joint_states_sub_ = node_.subscribe(string("/atlas/joint_states"), 100, &App::joint_states_cb,this);
 
   // The position and orientation from BDI's own estimator (or GT from Gazebo):
   if (send_ground_truth_){
@@ -170,10 +171,10 @@ App::App(ros::NodeHandle node_, bool send_ground_truth_) :
 
 
   // Multisense Joint Angles:
-  head_joint_states_sub_ = node_.subscribe(string("/spindle_state"), 100, &App::head_joint_states_cb,this);
+  head_joint_states_sub_ = node_.subscribe(string("/multisense/joint_states"), 100, &App::head_joint_states_cb,this);
 
   // Laser:
-  rotating_scan_sub_ = node_.subscribe(string("/multisense_sl/laser/scan"), 100, &App::rotating_scan_cb,this);
+  rotating_scan_sub_ = node_.subscribe(string("/multisense/lidar_scan"), 100, &App::rotating_scan_cb,this);
 
   // LM:
   foot_sensor_sub_ = node_.subscribe(string("/foot_contact_service/foot_sensor"), 100, &App::foot_sensor_cb,this);
@@ -211,7 +212,7 @@ void App::foot_sensor_cb(const trooper_mlc_msgs::FootSensorConstPtr& msg){
 
 
 void App::behavior_cb(const std_msgs::Int32ConstPtr& msg){
-//  ROS_ERROR("BHER %d", msg->data );
+//  ROS_INFO("BHER %d", msg->data );
   pronto::atlas_behavior_t msg_out;
 
   msg_out.utime = last_joint_state_utime_;
@@ -225,7 +226,7 @@ void App::behavior_cb(const std_msgs::Int32ConstPtr& msg){
 int scan_counter=0;
 void App::rotating_scan_cb(const sensor_msgs::LaserScanConstPtr& msg){
   if (scan_counter%80 ==0){
-    ROS_ERROR("LSCAN [%d]", scan_counter );
+    ROS_INFO("LSCAN [%d]", scan_counter );
     //std::cout << "SCAN " << scan_counter << "\n";
   }  
   scan_counter++;
@@ -251,7 +252,7 @@ void App::send_lidar(const sensor_msgs::LaserScanConstPtr& msg,string channel ){
 int gt_counter =0;
 void App::pose_bdi_cb(const nav_msgs::OdometryConstPtr& msg){
   if (gt_counter%1000 ==0){
-    ROS_ERROR("BDI  [%d]", gt_counter );
+    ROS_INFO("BDI  [%d]", gt_counter );
   }  
   gt_counter++;
 
@@ -407,7 +408,7 @@ void App::sendMultisenseState(int64_t utime, float position, float velocity){
 
   msg_out.joint_position[0] = position;
   msg_out.joint_velocity[0] = velocity;
-  msg_out.joint_name[0] = "hokuyo_joint";
+  msg_out.joint_name[0] = "motor_joint";
 
   lcm_publish_.publish("MULTISENSE_STATE", &msg_out);  
 }
