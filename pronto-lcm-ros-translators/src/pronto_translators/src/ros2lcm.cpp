@@ -140,6 +140,9 @@ private:
   void vigir_atlas_state_cb(const atlas_msgs::AtlasStateConstPtr& msg);
   ros::Subscriber vigir_atlas_state_sub_;
   
+  void sysCommandCallback(const std_msgs::String::ConstPtr& msg);
+  ros::Subscriber sys_command_sub_;
+  
   //Helper for filling out F/T data
   void appendForceTorque(pronto::force_torque_t& msg_out, const atlas_msgs::AtlasState& msg_in);
 
@@ -198,6 +201,8 @@ App::App(ros::NodeHandle node_, bool send_ground_truth_) :
                                         &App::vigir_atlas_state_cb,
                                         this,
                                         ros::TransportHints().tcpNoDelay());
+  
+  sys_command_sub_ = node_.subscribe("/syscommand", 1, &App::sysCommandCallback, this);
 
 };
 
@@ -756,6 +761,12 @@ void App::appendForceTorque(pronto::force_torque_t& msg_out, const atlas_msgs::A
   msg_out.r_hand_torque[2] =  0;
 }
 
+void App::sysCommandCallback(const std_msgs::String::ConstPtr& msg){
+  if (msg->data == "reset"){
+    ROS_INFO("Resetting Pronto state estimate not yet implemented, use se-simple-restart script");
+    //@TODO: Implement state estimator reset as in script
+  }
+}
 
 
 int main(int argc, char **argv){
