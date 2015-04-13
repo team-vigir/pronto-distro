@@ -1,0 +1,7 @@
+<launch>
+        <node name="ros2lcm_ihmc" type="ros2lcm_ihmc" pkg="pronto_translators" output="screen" args="mode_state_estimation">
+        </node>
+        <node name="lcm2ros" type="lcm2ros" pkg="pronto_translators" output="screen">
+                <remap from="/pose_body" to="/ihmc_ros/localization/pelvis_odom_pose_correction" />
+        </node>
+</launch>
