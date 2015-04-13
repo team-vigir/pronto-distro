@@ -168,7 +168,11 @@ App::App(ros::NodeHandle node_, bool send_ground_truth_) :
     //pose_bdi_sub_ = node_.subscribe(string("/robot_pose_service/odom"), 100, &App::pose_bdi_cb,this);
 
     //Changed for ViGIR
-    pose_bdi_sub_ = node_.subscribe(string("/flor/controller/odometry"), 100, &App::pose_bdi_cb,this);
+    pose_bdi_sub_ = node_.subscribe(string("/flor/controller/odometry"),
+                                    100,
+                                    &App::pose_bdi_cb,
+                                    this,
+                                    ros::TransportHints().tcpNoDelay());
   }
   pose_vicon_sub_ = node_.subscribe(string("/vicon/pelvis"), 100, &App::pose_vicon_cb,this);
 
