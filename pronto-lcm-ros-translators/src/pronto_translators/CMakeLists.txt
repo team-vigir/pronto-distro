@@ -185,9 +185,9 @@ pods_use_pkg_config_packages(ros2lcm lcm lcmtypes_pronto-lcmtypes bot2-core eige
 add_dependencies(ros2lcm trooper_mlc_msgs_generate_messages_cpp) 
 
 # this same translator is used by Edinburgh:
-add_executable(ros2lcm_ihmc src/ros2lcm_ihmc.cpp)
-target_link_libraries(ros2lcm_ihmc ${catkin_LIBRARIES})
-pods_use_pkg_config_packages(ros2lcm_ihmc lcm lcmtypes_pronto-lcmtypes bot2-core eigen3)
+#add_executable(ros2lcm_ihmc src/ros2lcm_ihmc.cpp)
+#target_link_libraries(ros2lcm_ihmc ${catkin_LIBRARIES})
+#pods_use_pkg_config_packages(ros2lcm_ihmc lcm lcmtypes_pronto-lcmtypes bot2-core eigen3)
 
 add_executable(ros2lcm_thormang src/ros2lcm_thormang.cpp)
 target_link_libraries(ros2lcm_thormang ${catkin_LIBRARIES})
