@@ -192,3 +192,11 @@ add_dependencies(ros2lcm trooper_mlc_msgs_generate_messages_cpp)
 add_executable(ros2lcm_thormang src/ros2lcm_thormang.cpp)
 target_link_libraries(ros2lcm_thormang ${catkin_LIBRARIES})
 pods_use_pkg_config_packages(ros2lcm_thormang lcm lcmtypes_pronto-lcmtypes bot2-core eigen3) 
+
+
+install( TARGETS
+    lcm2ros
+    ros2lcm
+    ros2lcm_thormang
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
