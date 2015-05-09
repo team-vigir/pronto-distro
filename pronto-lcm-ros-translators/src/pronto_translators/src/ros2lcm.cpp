@@ -39,6 +39,7 @@
 #include "lcmtypes/pronto/atlas_raw_imu_batch_t.hpp"
 
 #include "lcmtypes/pronto/multisense_state_t.hpp"
+#include <lcmtypes/mav/indexed_measurement_t.hpp>
 //#include <lcmtypes/multisense.hpp>
 //#include "lcmtypes/pronto/imu_t.hpp"
 
@@ -767,8 +768,69 @@ void App::appendForceTorque(pronto::force_torque_t& msg_out, const atlas_msgs::A
 
 void App::sysCommandCallback(const std_msgs::String::ConstPtr& msg){
   if (msg->data == "reset"){
-    ROS_INFO("Resetting Pronto state estimate not yet implemented, use se-simple-restart script");
+    //ROS_INFO("Resetting Pronto state estimate not yet implemented, use se-simple-restart script");
     //@TODO: Implement state estimator reset as in script
+    
+    pronto::utime_t reset_time_msg;
+    int64_t reset_time = (int64_t) ros::Time::now().toNSec()/1000; // from nsec to usec
+    reset_time_msg.utime = reset_time;
+    
+    lcm_publish_.publish("STATE_EST_RESTART", &reset_time_msg);
+    
+    ROS_INFO("Sent STATE_EST_RESTART");
+    
+    ros::Duration(1.0).sleep();
+    
+    
+    pronto::utime_t est_ready_time_msg;
+    int64_t est_ready_time = (int64_t) ros::Time::now().toNSec()/1000; // from nsec to usec
+    est_ready_time_msg.utime = est_ready_time;
+    
+    lcm_publish_.publish("STATE_EST_READY", &est_ready_time_msg);
+    
+    ROS_INFO("Sent STATE_EST_READY");
+    
+    ros::Duration(1.0).sleep();
+    
+    mav::indexed_measurement_t measurement;
+    
+    measurement.utime = (int64_t) ros::Time::now().toNSec()/1000;
+    measurement.state_utime = measurement.utime;
+    
+    measurement.measured_dim = 4;
+    
+    measurement.z_effective.push_back(0);
+    measurement.z_effective.push_back(0);
+    measurement.z_effective.push_back(0.85);
+    measurement.z_effective.push_back(0);
+    
+    measurement.z_indices.push_back(9);
+    measurement.z_indices.push_back(10);
+    measurement.z_indices.push_back(11);
+    measurement.z_indices.push_back(8);
+    
+    measurement.measured_cov_dim = 16;
+    
+    measurement.R_effective.push_back(0.25);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0.25);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0.25);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0.75);
+    
+    lcm_publish_.publish("MAV_STATE_EST_VIEWER_MEASUREMENT", &measurement);
+    
+    ROS_INFO("Sent MAV_STATE_EST_VIEWER_MEASUREMENT");
   }
 }
 
