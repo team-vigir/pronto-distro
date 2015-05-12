@@ -418,7 +418,7 @@ void App::sendMultisenseState(int64_t utime, float position, float velocity){
 
   msg_out.joint_position[0] = position;
   msg_out.joint_velocity[0] = velocity;
-  msg_out.joint_name[0] = "motor_joint";
+  msg_out.joint_name[0] = "hokuyo_joint";
 
   lcm_publish_.publish("MULTISENSE_STATE", &msg_out);  
 }
