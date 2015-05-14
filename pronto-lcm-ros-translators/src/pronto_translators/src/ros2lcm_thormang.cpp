@@ -30,6 +30,8 @@
 #include "lcmtypes/pronto/robot_state_t.hpp"
 #include "lcmtypes/pronto/utime_t.hpp"
 #include "lcmtypes/microstrain/ins_t.hpp"
+
+#include <lcmtypes/mav/indexed_measurement_t.hpp>
 using namespace std;
 
 class App{
@@ -61,6 +63,10 @@ private:
   double last_ins_quat_[4];
   int64_t last_joint_state_utime_;
   bool verbose_;
+
+  // Hector additions:
+  void sysCommandCallback(const std_msgs::String::ConstPtr& msg);
+  ros::Subscriber sys_command_sub_;
 };
 
 App::App(ros::NodeHandle node_, bool send_ground_truth_) :
@@ -71,11 +77,13 @@ App::App(ros::NodeHandle node_, bool send_ground_truth_) :
   }
 
   joint_states_sub_ = node_.subscribe(string("/thor_mang/joint_states"), 100, &App::joint_states_cb,this);
-  l_foot_sensor_sub_ = node_.subscribe(string("/thor_mang/l_foot_raw"), 100, &App::l_foot_sensor_cb,this);
-  r_foot_sensor_sub_ = node_.subscribe(string("/thor_mang/r_foot_raw"), 100, &App::r_foot_sensor_cb,this);
+  l_foot_sensor_sub_ = node_.subscribe(string("/thor_mang/l_foot"), 100, &App::l_foot_sensor_cb,this);
+  r_foot_sensor_sub_ = node_.subscribe(string("/thor_mang/r_foot"), 100, &App::r_foot_sensor_cb,this);
   imu_sub_ = node_.subscribe(string("/thor_mang/pelvis_imu"), 100, &App::imu_cb,this);
 
   verbose_ = false;
+
+  sys_command_sub_ = node_.subscribe("/syscommand", 1, &App::sysCommandCallback, this);
 };
 
 App::~App()  {
@@ -197,6 +205,74 @@ void App::appendFootSensor(pronto::force_torque_t& msg_out){
   msg_out.r_hand_torque[0] =  0;
   msg_out.r_hand_torque[1] =  0;
   msg_out.r_hand_torque[2] =  0;
+}
+
+void App::sysCommandCallback(const std_msgs::String::ConstPtr& msg){
+  if (msg->data == "reset"){
+    //ROS_INFO("Resetting Pronto state estimate not yet implemented, use se-simple-restart script");
+    //@TODO: Implement state estimator reset as in script
+    
+    pronto::utime_t reset_time_msg;
+    int64_t reset_time = (int64_t) ros::Time::now().toNSec()/1000; // from nsec to usec
+    reset_time_msg.utime = reset_time;
+    
+    lcm_publish_.publish("STATE_EST_RESTART", &reset_time_msg);
+    
+    ROS_INFO("Sent STATE_EST_RESTART");
+    
+    ros::Duration(1.0).sleep();
+    
+    
+    pronto::utime_t est_ready_time_msg;
+    int64_t est_ready_time = (int64_t) ros::Time::now().toNSec()/1000; // from nsec to usec
+    est_ready_time_msg.utime = est_ready_time;
+    
+    lcm_publish_.publish("STATE_EST_READY", &est_ready_time_msg);
+    
+    ROS_INFO("Sent STATE_EST_READY");
+    
+    ros::Duration(1.0).sleep();
+    
+    mav::indexed_measurement_t measurement;
+    
+    measurement.utime = (int64_t) ros::Time::now().toNSec()/1000;
+    measurement.state_utime = measurement.utime;
+    
+    measurement.measured_dim = 4;
+    
+    measurement.z_effective.push_back(0);
+    measurement.z_effective.push_back(0);
+    measurement.z_effective.push_back(0.85);
+    measurement.z_effective.push_back(0);
+    
+    measurement.z_indices.push_back(9);
+    measurement.z_indices.push_back(10);
+    measurement.z_indices.push_back(11);
+    measurement.z_indices.push_back(8);
+    
+    measurement.measured_cov_dim = 16;
+    
+    measurement.R_effective.push_back(0.25);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0.25);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0.25);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0);
+    measurement.R_effective.push_back(0.75);
+    
+    lcm_publish_.publish("MAV_STATE_EST_VIEWER_MEASUREMENT", &measurement);
+    
+    ROS_INFO("Sent MAV_STATE_EST_VIEWER_MEASUREMENT");
+  }
 }
 
 
