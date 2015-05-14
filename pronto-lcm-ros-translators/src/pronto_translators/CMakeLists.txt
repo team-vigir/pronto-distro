@@ -14,9 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  atlas_hardware_interface
-  vigir_atlas_control_msgs
-  atlas_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -179,10 +176,10 @@ add_executable(lcm2ros src/lcm2ros.cpp)
 target_link_libraries(lcm2ros ${catkin_LIBRARIES})
 pods_use_pkg_config_packages(lcm2ros lcm lcmtypes_pronto-lcmtypes bot2-core)  
 
-add_executable(ros2lcm src/ros2lcm.cpp)
-target_link_libraries(ros2lcm ${catkin_LIBRARIES})
-pods_use_pkg_config_packages(ros2lcm lcm lcmtypes_pronto-lcmtypes bot2-core eigen3) 
-add_dependencies(ros2lcm trooper_mlc_msgs_generate_messages_cpp) 
+#add_executable(ros2lcm src/ros2lcm.cpp)
+#target_link_libraries(ros2lcm ${catkin_LIBRARIES})
+#pods_use_pkg_config_packages(ros2lcm lcm lcmtypes_pronto-lcmtypes bot2-core eigen3) 
+#add_dependencies(ros2lcm trooper_mlc_msgs_generate_messages_cpp) 
 
 # this same translator is used by Edinburgh:
 #add_executable(ros2lcm_ihmc src/ros2lcm_ihmc.cpp)
@@ -196,7 +193,7 @@ pods_use_pkg_config_packages(ros2lcm_thormang lcm lcmtypes_pronto-lcmtypes bot2-
 
 install( TARGETS
     lcm2ros
-    ros2lcm
+    #ros2lcm
     ros2lcm_thormang
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
