@@ -673,7 +673,7 @@ jm.push_back (  std::make_pair( 49      ,       27      )); */
   jm.push_back (  std::make_pair((int)JOINT_R_ARM_UWY , 19)); //std::make_pair( getIndex(msg->name, "r_arm_wry")
   jm.push_back (  std::make_pair((int)JOINT_L_LEG_KNY ,  7)); //std::make_pair( getIndex(msg->name, "l_leg_kny")
   jm.push_back (  std::make_pair((int)JOINT_L_ARM_ELX , 20)); //std::make_pair( getIndex(msg->name, "l_arm_elx")
-  jm.push_back (  std::make_pair((int)JOINT_L_LEG_AKY , 14)); //std::make_pair( getIndex(msg->name, "r_leg_aky")
+  jm.push_back (  std::make_pair((int)JOINT_R_LEG_AKY , 14)); //std::make_pair( getIndex(msg->name, "r_leg_aky")
   jm.push_back (  std::make_pair((int)JOINT_L_ARM_SHZ , 21)); // std::make_pair( getIndex(msg->name, "l_arm_shy")
   jm.push_back (  std::make_pair((int)JOINT_R_LEG_KNY , 13)); //std::make_pair( getIndex(msg->name, "r_leg_kny")
   jm.push_back (  std::make_pair((int)JOINT_R_ARM_MWX , 22)); //std::make_pair( getIndex(msg->name, "r_arm_wrx")
