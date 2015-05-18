@@ -28,6 +28,7 @@
 #include <trooper_mlc_msgs/RawIMUData.h>
 
 #include <vigir_atlas_control_msgs/VigirCachedIMUData.h>
+#include <flor_control_msgs/FlorControlMode.h>
 #include <atlas_msgs/AtlasState.h>
 
 #include <lcm/lcm-cpp.hpp>
@@ -37,6 +38,7 @@
 #include "lcmtypes/pronto/atlas_state_t.hpp"
 #include "lcmtypes/pronto/utime_t.hpp"
 #include "lcmtypes/pronto/atlas_raw_imu_batch_t.hpp"
+#include "lcmtypes/pronto/controller_status_t.hpp"
 
 #include "lcmtypes/pronto/multisense_state_t.hpp"
 #include <lcmtypes/mav/indexed_measurement_t.hpp>
@@ -144,6 +146,9 @@ private:
   void sysCommandCallback(const std_msgs::String::ConstPtr& msg);
   ros::Subscriber sys_command_sub_;
   
+  void controlModeCallback(const flor_control_msgs::FlorControlMode& msg);
+  ros::Subscriber control_mode_sub_;
+  
   //Helper for filling out F/T data
   void appendForceTorque(pronto::force_torque_t& msg_out, const atlas_msgs::AtlasState& msg_in);
 
@@ -207,7 +212,9 @@ App::App(ros::NodeHandle node_, bool send_ground_truth_) :
                                         this,
                                         ros::TransportHints().tcpNoDelay());
   
-  sys_command_sub_ = node_.subscribe("/syscommand", 1, &App::sysCommandCallback, this);
+  sys_command_sub_ = node_.subscribe("/syscommand", 3, &App::sysCommandCallback, this);
+  
+  control_mode_sub_ = node_.subscribe("/flor/controller/mode", 5, &App::controlModeCallback, this);
 
 };
 
@@ -832,6 +839,26 @@ void App::sysCommandCallback(const std_msgs::String::ConstPtr& msg){
     
     ROS_INFO("Sent MAV_STATE_EST_VIEWER_MEASUREMENT");
   }
+}
+
+void App::controlModeCallback(const flor_control_msgs::FlorControlMode& msg){
+  
+  pronto::controller_status_t controller_status_msg;
+  
+  controller_status_msg.utime = (int64_t) ros::Time::now().toNSec()/1000;
+  
+  if (msg.bdi_current_behavior == 3){
+    controller_status_msg.state = pronto::controller_status_t::STANDING;
+  }else if (msg.bdi_current_behavior == 6){
+    controller_status_msg.state = pronto::controller_status_t::MANIPULATING;
+  }else{
+    // We are only interested in STANDING and MANIPULATING, set to WALKING
+    // otherwise for the moment.
+    controller_status_msg.state = pronto::controller_status_t::WALKING;
+  }
+     
+  lcm_publish_.publish("CONTROLLER_STATUS", &controller_status_msg);  
+    
 }
 
 

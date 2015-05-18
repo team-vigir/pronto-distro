@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   atlas_hardware_interface
   vigir_atlas_control_msgs
+  flor_control_msgs
   atlas_msgs
 )
 
