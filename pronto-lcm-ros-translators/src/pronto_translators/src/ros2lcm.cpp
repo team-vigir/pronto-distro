@@ -774,7 +774,7 @@ void App::appendForceTorque(pronto::force_torque_t& msg_out, const atlas_msgs::A
 }
 
 void App::sysCommandCallback(const std_msgs::String::ConstPtr& msg){
-  if (msg->data == "reset"){
+  if (msg->data == "reset_pose_estimation"){
     //ROS_INFO("Resetting Pronto state estimate not yet implemented, use se-simple-restart script");
     //@TODO: Implement state estimator reset as in script
     
