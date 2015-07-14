@@ -28,7 +28,7 @@
 #include <trooper_mlc_msgs/RawIMUData.h>
 
 #include <vigir_atlas_control_msgs/VigirCachedIMUData.h>
-#include <flor_control_msgs/FlorControlMode.h>
+#include <vigir_atlas_control_msgs/VigirAtlasControlMode.h>
 #include <atlas_msgs/AtlasState.h>
 
 #include <lcm/lcm-cpp.hpp>
@@ -146,7 +146,7 @@ private:
   void sysCommandCallback(const std_msgs::String::ConstPtr& msg);
   ros::Subscriber sys_command_sub_;
   
-  void controlModeCallback(const flor_control_msgs::FlorControlMode& msg);
+  void controlModeCallback(const vigir_atlas_control_msgs::VigirAtlasControlMode& msg);
   ros::Subscriber control_mode_sub_;
   
   //Helper for filling out F/T data
@@ -841,7 +841,7 @@ void App::sysCommandCallback(const std_msgs::String::ConstPtr& msg){
   }
 }
 
-void App::controlModeCallback(const flor_control_msgs::FlorControlMode& msg){
+void App::controlModeCallback(const vigir_atlas_control_msgs::VigirAtlasControlMode& msg){
   
   pronto::controller_status_t controller_status_msg;
   
